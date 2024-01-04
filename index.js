@@ -27,12 +27,16 @@ mongoose.connect(DatabaseConnection)
 
 const PORT = process.env.PORT || 9898
 
+let count = 0;
+
 app.get('/',(_,res)=>{
-    console.log('ONLINE -  [ / ] ')
+    count++;
+    console.log('ONLINE -  [ / ] -'+count)
     res.send({server:'online'})
 })
 app.post('/CreateAccount',(req,res)=>{
-    console.log('CreateAccount - [ /CreateAccount ] ')
+    count++;
+    console.log('CreateAccount - [ /CreateAccount ] -'+count)
     const _data_ = req.body
     USER_MODEL.create(_data_)
         .then((resp)=>{
@@ -45,7 +49,8 @@ app.post('/CreateAccount',(req,res)=>{
         })
 })
 app.post('/Login',(req,res)=>{
-    console.log('LOGIN -[ /Login ] ')
+    count++;;
+    console.log('LOGIN -[ /Login ] -'+count)
     const _data_ = req.body
     USER_MODEL.findOne(_data_)
         .then((response)=>{
@@ -65,7 +70,8 @@ app.post('/Login',(req,res)=>{
 })
 
 app.post('/save_data',(req,res)=>{
-    console.log("SAVE DATA - [ /save_data ]")
+    count++;;
+    console.log("SAVE DATA - [ /save_data ] -"+count)
     const _data_ = req.body;
     const USER_UID=_data_.USER_UID;
     USER_DATA_MODEL.findOneAndUpdate(
@@ -85,7 +91,8 @@ app.post('/save_data',(req,res)=>{
 
 app.post('/get_user_data',(req,res)=>{
     const USER_UID = req.body;
-    console.log("GET USER DATA - [ /get_user_data ] ")
+    count++;;
+    console.log("GET USER DATA - [ /get_user_data ] -"+count)
     console.log(USER_UID)
     USER_DATA_MODEL.findOne(USER_UID)
         .then((response)=>{
