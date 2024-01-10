@@ -85,6 +85,16 @@ const coding_platforms = {
             default : 1 
         }
     },
+     Leet_Code : {
+        link : {
+            type : String,
+            default : ""
+        },
+        icon : {
+            type : Number,
+            default : 2
+        }
+    },
     Git_hub : {
         link : {
             type : String,
