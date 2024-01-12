@@ -4,6 +4,7 @@ const { default: helmet } = require('helmet');
 const { default: mongoose } = require('mongoose');
 const USER_MODEL = require('./Models/UserModel_');
 const USER_DATA_MODEL = require('./Models/USER_DATA_MODEL');
+const POST_MODEL = require('./Models/POST_MODEL');
 
 
 const app = express();
@@ -109,6 +110,54 @@ app.post('/get_user_data',(req,res)=>{
         })
 })
 
+app.post('/upload_new_post',(req,res)=>{
+    count++;
+    console.log("UPLOAD_NEW_POST__"+count);
+    const post_data = req.body.data;
+    // console.log(post_data)
+    console.log(post_data.USER_UID)
+    console.log(post_data.postID)
+    console.log(post_data)
+    // Create new post
+    // Add post ID to the users post array ;
+    POST_MODEL.create(post_data)
+        .then((reponse)=>
+        {
+            USER_MODEL.findOneAndUpdate(
+                {USER_UID:post_data.USER_UID},
+                { $push: {PostsArray:post_data.postID}},
+                {new : true}
+                )
+                .then((resp)=>{
+                    console.log(resp);
+                    res.status(200).json({message:"ok"})
+                })
+                .catch((err)=>{
+                    console.log(err)
+                    res.status(400).json({message:"NO",error:err})
+                })
+        })
+        .catch((error)=>{
+            console.log(error);
+            res.status(400).json({message:"NO",error:error})
+
+        })
+    
+})
+
+app.get('/get_all_posts',(req,res)=>{
+    count++;
+    console.log("GET_ALL_POSTS _ "+count);
+    POST_MODEL.find({})
+        .then((response)=>{
+            // console.log(response);
+            res.status(200).json({message:"OK",response})
+        })
+        .catch((err)=>{
+            console.log("Error",err);
+            res.status(500).json({message:"NO"})
+        })
+})
 app.listen(PORT,()=>{
     console.log("Server running on PORT :"+PORT)
 })

@@ -19,6 +19,10 @@ const USER_SCHEMA = new mongoose.Schema({
     USER_UID : {
         type : String,
         required : true
+    },
+    PostsArray : {
+        type : Array,
+        default : []
     }
 })
 

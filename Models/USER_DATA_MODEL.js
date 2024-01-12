@@ -82,7 +82,7 @@ const coding_platforms = {
         },
         icon : {
             type : Number,
-            default : 1 
+            default : 0 
         }
     },
     Git_hub : {
@@ -92,7 +92,17 @@ const coding_platforms = {
         },
         icon : {
             type : Number,
-            default : 2 
+            default : 1
+        }
+    },
+    Leet_Code : {
+        link : {
+            type : String,
+            default : ""
+        },
+        icon : {
+            type : Number,
+            default : 2
         }
     },
     Code_Chef : {
