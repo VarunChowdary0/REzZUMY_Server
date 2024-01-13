@@ -186,6 +186,71 @@ app.post('/get_all_posts_of_user',(req,res)=>{
             res.status(404).json({message:"NO"});
         })
 })
+
+app.post('/add_like',(req,res)=>{
+    count++;
+    console.log("ADD - LIKE - "+count);
+    const username = req.body.username;
+    const postID = req.body.postID;
+    console.log(username,postID)
+    POST_MODEL.findOneAndUpdate(
+        {postID:postID},
+        {$addToSet:{likedBy:username}},
+        {new:true}
+    )
+    .then((response)=>{
+        console.log(response.likedBy.length)
+        POST_MODEL.findOneAndUpdate(
+            {postID:postID},
+            {$set: {noOfStars:response.likedBy.length}},
+            {new:true}
+            )
+            .then((x)=>{
+                // console.log(x);
+                res.status(200).json({message:"OK",data:response,likes:response.likedBy.length});
+            })
+            .catch((er)=>{
+                // console.log(er)
+                res.status(400).json({message:"Failed"});
+            })
+    })
+    .catch((Err)=>{
+        console.log(Err);
+        res.status(400).json({message:"Failed"});
+    })
+})
+app.post('/remove_like',(req,res)=>{
+    count++;
+    console.log("REMOVE - LIKE - "+count);
+    const username = req.body.username;
+    const postID = req.body.postID;
+    console.log(username,postID)
+    POST_MODEL.findOneAndUpdate(
+        {postID:postID},
+        {$pull:{likedBy:username}},
+        {new:true}
+    )
+    .then((response)=>{
+        POST_MODEL.findOneAndUpdate(
+            {postID:postID},
+            {$set: {noOfStars:response.likedBy.length}},
+            {new:true}
+            )
+            .then((x)=>{
+                // console.log(x);
+                console.log(response.likedBy.length)
+                res.status(200).json({message:"OK",data:response,likes:response.likedBy.length});
+            })
+            .catch((er)=>{
+                // console.log(er)
+                res.status(400).json({message:"Failed"});
+            })
+    })
+    .catch((Err)=>{
+        console.log(Err);
+        res.status(400).json({message:"Failed"});
+    })
+})
 app.listen(PORT,()=>{
     console.log("Server running on PORT :"+PORT)
 })

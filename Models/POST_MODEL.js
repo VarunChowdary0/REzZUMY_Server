@@ -46,10 +46,14 @@ const post_schema = new mongoose.Schema({
         type : Array,
         default : []
     },
-    likedBy : {
-        type : Array,
-        default : [],
+    likedBy: {
+        type: [{
+          type: String,
+          unique: true
+        }],
+        default: []
     },
+    
     Post_code : {
         type : String,
         default : "",
@@ -71,9 +75,11 @@ const post_schema = new mongoose.Schema({
         },
         default : {}
     },
-    noOfStars : {
-        type : Number,
-        default : 0,
+    noOfStars: {
+        type: Number,
+        default: function() {
+            return this.likedBy.length;
+        }
     },
     noofCommas : {
         type : Number,
