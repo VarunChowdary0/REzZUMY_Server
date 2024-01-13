@@ -115,9 +115,9 @@ app.post('/upload_new_post',(req,res)=>{
     console.log("UPLOAD_NEW_POST__"+count);
     const post_data = req.body.data;
     // console.log(post_data)
-    console.log(post_data.USER_UID)
-    console.log(post_data.postID)
-    console.log(post_data)
+    // console.log(post_data.USER_UID)
+    // console.log(post_data.postID)
+    // console.log(post_data)
     // Create new post
     // Add post ID to the users post array ;
     POST_MODEL.create(post_data)
@@ -156,6 +156,34 @@ app.get('/get_all_posts',(req,res)=>{
         .catch((err)=>{
             console.log("Error",err);
             res.status(500).json({message:"NO"})
+        })
+})
+
+// app.post('/get_user_posts_info',(req,res)=>{
+//     const USER_UID = req.data;
+//     count++;
+//     console.log("GET_USERS_POST - "+count);
+//     USER_MODEL.findOne(USER_UID)
+//         .then((response)=>{
+//             // console.log(response);
+//             res.status(200).json({message:"FOUND",data:response.PostsArray})
+//         })
+//         .catch((err)=>{
+//             console.log(err);
+//             res.status(404).json({message:"Not Found"});
+//         })
+// })
+app.post('/get_all_posts_of_user',(req,res)=>{
+    const USER_UID = req.body;
+    count++;
+    console.log("GET_POSTS_OF_USER - "+count);
+    POST_MODEL.find(USER_UID)
+        .then((response)=>{
+            // console.log(response)
+            res.status(200).json({message:"OK",data:response});
+        })
+        .catch((err)=>{
+            res.status(404).json({message:"NO"});
         })
 })
 app.listen(PORT,()=>{

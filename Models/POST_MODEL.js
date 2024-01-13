@@ -26,6 +26,10 @@ const post_schema = new mongoose.Schema({
         type : String,
         required:true
     },
+    postHeight : {
+        type : Number,
+        default : 450
+    },
     profileLink : {
         type : String,
         required : true
