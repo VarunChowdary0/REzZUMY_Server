@@ -293,7 +293,6 @@ app.post('/get_user_stats',(req,res)=>{
     USER_STATS_MODEL.findOne(USER_UID)
     .then((response)=>{
         // console.log(response);
-        res.status(200).json({message:"OK",data:response});
         if(response===null){
             USER_STATS_MODEL.create(
                 USER_UID
@@ -306,6 +305,9 @@ app.post('/get_user_stats',(req,res)=>{
                 console.log(er);
                 res.status(500).json({message:"NO",data:"NA"});
             })
+        }
+        else{
+            res.status(200).json({message:"OK",data:response});
         }
     })
     .catch((err)=>{

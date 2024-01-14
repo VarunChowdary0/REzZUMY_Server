@@ -21,7 +21,6 @@ const connectionSchema = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 7,
-        unique: true,
         index: true  // Adding an index for better query performance
     }
 });
