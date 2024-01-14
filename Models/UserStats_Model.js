@@ -1,45 +1,55 @@
 const mongoose = require('mongoose');
 
-const user_stats = new mongoose.Schema({
-    USER_UID : {
-        type : String , 
-        required : true
+const connectionSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
     },
-    connections : {
-        type : [
-            {
-                name : {
-                    type :String,
-                    required :true
-                },profileLink : {
-                    type : String,
-                    required : true
-                },
-                Connection_USER_UID : {
-                    type : String,
-                    required :true
-                },
-                occupation : {
-                    type :String,
-                    required : true,
-                    unique : true
-                },
-                mail : {
-                    type : String,
-                    required : true,
-                    unique : true,
-                    minLength : 7,
-                }
-            }
-        ],
-
+    profileLink: {
+        type: String,
+        required: true
     },
-    credit_score : {
-        type : Number,
-        default : 0
+    Connection_USER_UID: {
+        type: String,
+        required: true
     },
-    contributions : {
-        type : Array,
-        default : []
+    occupation: {
+        type: String,
+        required: true,
+    },
+    mail: {
+        type: String,
+        required: true,
+        minLength: 7,
+        unique: true,
+        index: true  // Adding an index for better query performance
     }
-})
+});
+
+const userStatsSchema = new mongoose.Schema({
+    USER_UID: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true  // Adding an index for better query performance
+    },
+    data: {
+        connections: {
+            type: [connectionSchema],
+            default: []
+        },
+        credit_score: {
+            type: Number,
+            default: 0
+        },
+        contributions: {
+            type: Array,
+            default: []
+        }
+    },
+    // You can remove the 'default' property here
+});
+
+const UserStatModel = mongoose.model('UserStat', userStatsSchema);
+
+module.exports = UserStatModel;

@@ -5,6 +5,7 @@ const { default: mongoose } = require('mongoose');
 const USER_MODEL = require('./Models/UserModel_');
 const USER_DATA_MODEL = require('./Models/USER_DATA_MODEL');
 const POST_MODEL = require('./Models/POST_MODEL');
+const USER_STATS_MODEL = require('./Models/UserStats_Model');
 
 
 const app = express();
@@ -29,6 +30,38 @@ mongoose.connect(DatabaseConnection)
 const PORT = process.env.PORT || 9898
 
 let count = 0;
+
+// _id: new ObjectId('6596dd26d0dc0ae2a2433e24'),
+// username: 'spiderman',
+// password: 'ilovemj',
+// mail: 'spiderman@marvel.com',
+// USER_UID: '8b90fc9a-5206-4403-a72b-ae493509fafe',
+// __v: 0,
+// PostsArray: [
+//   '30629522-d02f-448b-8a64-17a6ed763adc_post',
+//   'caf2ca0b-3d16-4afa-b095-85f9e7e89a74_post',
+//   '97f13ce3-62d8-4324-bb4a-8134bd4ec4a7_post'
+// ]
+// }
+const getUserDetails = (USER_UID,name,prfLin,occ) => {
+   return USER_MODEL.findOne({
+        USER_UID:USER_UID
+        })
+        .then((res)=>{
+            const obj = {
+                name:name,
+                profileLink:prfLin,
+                Connection_USER_UID:res.USER_UID,
+                occupation:occ,
+                mail:res.mail
+            }
+            return obj;
+        })
+        .catch((err)=>{
+            console.log(err);
+            return err;
+        })
+}
 
 app.get('/',(_,res)=>{
     count++;
@@ -199,7 +232,7 @@ app.post('/add_like',(req,res)=>{
         {new:true}
     )
     .then((response)=>{
-        console.log(response.likedBy.length)
+        // console.log(response.likedBy.length)
         POST_MODEL.findOneAndUpdate(
             {postID:postID},
             {$set: {noOfStars:response.likedBy.length}},
@@ -238,7 +271,7 @@ app.post('/remove_like',(req,res)=>{
             )
             .then((x)=>{
                 // console.log(x);
-                console.log(response.likedBy.length)
+                // console.log(response.likedBy.length)
                 res.status(200).json({message:"OK",data:response,likes:response.likedBy.length});
             })
             .catch((er)=>{
@@ -250,6 +283,86 @@ app.post('/remove_like',(req,res)=>{
         console.log(Err);
         res.status(400).json({message:"Failed"});
     })
+})
+
+app.post('/get_user_stats',(req,res)=>{
+    count++;
+    console.log("GET_USER_STATS: == "+count);
+    USER_UID = req.body;
+    // console.log(USER_UID);
+    USER_STATS_MODEL.findOne(USER_UID)
+    .then((response)=>{
+        // console.log(response);
+        res.status(200).json({message:"OK",data:response});
+        if(response===null){
+            USER_STATS_MODEL.create(
+                USER_UID
+            )
+            .then((x)=>{
+                // console.log(x);
+                res.status(200).json({message:"OK",data:x});
+            })
+            .catch((er)=>{
+                console.log(er);
+                res.status(500).json({message:"NO",data:"NA"});
+            })
+        }
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.status(500).json({message:"NO",data:"NA"});
+    })
+})
+app.post('/make_connection',(req,res)=>{
+    count++;
+    console.log("MAKE CONNECTION - "+count);
+    const MyUID = req.body.my_uid;
+    // const MyName = req.body.myName;
+    // const MyPrfLin = req.body.myPrfLin;
+    // const MyOcc = req.body.myOcc;
+    const OTHER_UID = req.body.other_uid;
+    const OtherName = req.body.otherName;
+    const OtherPrfLin = req.body.other_Prf;
+    const OtherOcc = req.body.other_Occ;
+    getUserDetails(OTHER_UID,OtherName,OtherPrfLin,OtherOcc)
+    .then((abc)=>{
+        console.log("Other: ",abc);
+        USER_STATS_MODEL.findOneAndUpdate(
+            { USER_UID: MyUID },
+            { $addToSet: { 'data.connections': abc } },
+            { new: true }
+        )
+        .then((dd)=>{
+            res.status(200).json({message:"OK",data:abc});
+        })
+        .catch((er0)=>{
+            console.log(er0);
+            res.status(400).json({message:"NO"})
+        })
+    })
+    .catch((er1)=>{
+        console.log(er1);
+        res.status(400).json({message:"NO"})
+    })
+})
+app.post('/remove_connection',(req,res)=>{
+    count++;
+    console.log("Remove CONNECTION - "+count);
+    const MY_UID = req.body.My_UID;
+    const Other_UID = req.body.Other_UID;
+    console.log(MY_UID,Other_UID);
+    USER_STATS_MODEL.findOneAndUpdate(
+        { USER_UID: MY_UID },
+        { $pull: { 'data.connections': { Connection_USER_UID: Other_UID } } },
+        { new: true })
+        .then((resp)=>{
+            console.log(resp);
+            res.status(200).json({message:"OK",data:resp});
+        })
+        .catch((err)=>{
+            console.log(err);
+            res.status(200).json({message:"NO"});
+        })
 })
 app.listen(PORT,()=>{
     console.log("Server running on PORT :"+PORT)
